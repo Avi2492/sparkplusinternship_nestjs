@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 export interface Task {
   id: string;
   title: string;
