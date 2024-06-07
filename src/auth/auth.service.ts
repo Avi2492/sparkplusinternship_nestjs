@@ -1,6 +1,10 @@
 /* eslint-disable prettier/prettier */
 
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -45,6 +49,18 @@ export class AuthService {
       await this.usersRepository.save(user);
     } catch (error: any) {
       console.log(error.message);
+    }
+  }
+
+  async signIn(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+    const { username, password } = authCredentialsDto;
+
+    const user = await this.usersRepository.findOneBy({ username });
+
+    if (user && (await bcryptjs.compare(password, user.password))) {
+      return 'success';
+    } else {
+      throw new UnauthorizedException('Invalid username or password');
     }
   }
 }
