@@ -5,6 +5,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -24,10 +25,12 @@ import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
+  private logger = new Logger('TasksController');
   constructor(private tasksService: TasksService) {}
 
   @Get()
   async getTasks(@Query() filterDto: GetTasksFilterDto): Promise<Task[]> {
+    // this.logger.verbose(`User "${user.username}" retrieving all tasks. Filters: ${JSON.stringify(filtersDto)}`);
     return this.tasksService.getTasks(filterDto);
   }
 
@@ -44,6 +47,9 @@ export class TasksController {
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: User,
   ): Promise<Task> {
+    this.logger.verbose(
+      `User "${user.username}" creating a task. Data: ${JSON.stringify(createTaskDto)}`,
+    );
     const task = await this.tasksService.createTask(createTaskDto, user);
     return task;
   }
